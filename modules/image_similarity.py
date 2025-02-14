@@ -1,8 +1,10 @@
 import subprocess
+from base64 import b64encode
 
 import google.auth.transport.requests
 import google.oauth2.id_token
 import httpx
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from modules.utils import is_running_on_cloudrun
 
@@ -11,7 +13,7 @@ class ImageSimilarityAPIRequest:
     def __init__(self) -> None:
         self.url = "https://image-similarity-backend-cle7fyzzsq-uc.a.run.app/"
 
-    def get_id_token(self) -> str:
+    def authorize_post_request(self) -> str:
         if is_running_on_cloudrun():
             audience = "/".join(self.url.split("/")[:-1])
             auth_req = google.auth.transport.requests.Request()
@@ -22,17 +24,29 @@ class ImageSimilarityAPIRequest:
                 encoding="utf-8",
                 stdout=subprocess.PIPE,
             ).stdout.strip()
+
         return id_token
 
-    def get_image_similarity(self, body: dict) -> dict:
-        try:
-            response = httpx.post(
-                self.url,
-                json=body,
-                headers={"Authorization": f"Bearer {self.get_id_token()}"},
-                timeout=None,
-            )
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            return e.json()
+    def get_post_request_body(
+        self, old_image: UploadedFile, new_images: list[UploadedFile]
+    ) -> dict:
+        body = {}
+        body["image"] = b64encode(old_image.getvalue()).decode()
+        body["images"] = [b64encode(image.getvalue()).decode() for image in new_images]
+
+        return body
+
+    def get_image_similarity(
+        self, old_image: UploadedFile, new_images: list[UploadedFile]
+    ) -> dict:
+        id_token = self.authorize_post_request()
+        body = self.get_post_request_body(old_image, new_images)
+
+        response = httpx.post(
+            self.url,
+            json=body,
+            headers={"Authorization": f"Bearer {id_token}"},
+            timeout=None,
+        )
+
+        return response.json()[0]
