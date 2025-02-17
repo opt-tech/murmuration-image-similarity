@@ -83,7 +83,6 @@ def main() -> None:
         if ss.old_image and ss.new_images:
             if is_image_size_matched(ss.old_image, ss.new_images):
                 st.warning("入稿済みCRと新規CRsの画像サイズが一致していません。")
-                st.stop()
 
             image_similarity = ImageSimilarityAPIRequest()
             ss.similarities = image_similarity.get_image_similarity(
