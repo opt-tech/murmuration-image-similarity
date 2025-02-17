@@ -1,12 +1,11 @@
 import subprocess
-from base64 import b64encode
 
 import google.auth.transport.requests
 import google.oauth2.id_token
 import httpx
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from modules.utils import is_running_on_cloudrun
+from modules.utils import encode_image, is_running_on_cloudrun
 
 
 class ImageSimilarityAPIRequest:
@@ -31,8 +30,8 @@ class ImageSimilarityAPIRequest:
         self, old_image: UploadedFile, new_images: list[UploadedFile]
     ) -> dict:
         body = {}
-        body["image"] = b64encode(old_image.getvalue()).decode()
-        body["images"] = [b64encode(image.getvalue()).decode() for image in new_images]
+        body["image"] = encode_image(old_image)
+        body["images"] = [encode_image(img) for img in new_images]
 
         return body
 

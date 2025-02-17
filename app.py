@@ -4,7 +4,7 @@ import streamlit as st
 from streamlit import session_state as ss
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from modules import ImageSimilarityAPIRequest, is_image_size_matched
+from modules import ImageSimilarityAPIRequest, ThemeConfig, is_image_size_matched
 
 
 def display_sort_selectbox(
@@ -39,28 +39,36 @@ def display_gallery(images: list[UploadedFile], similarities: list[float]) -> No
         with image_cols[i % num_cols]:
             caption = shorten(images[i].name, width=30, placeholder="...")
             st.image(images[i], caption=caption, use_container_width=True)
-            st.html(f"<center>Similarity = {similarities[i]:.3f}</center>")
+            st.html(f"<center>{similarities[i]}</center>")
 
 
 def init() -> None:
     if "similarities" not in ss:
         ss.similarities = []
 
+    if "old_image" not in ss:
+        ss.old_image = None
+
     if "new_images" not in ss:
         ss.new_images = []
 
 
 def main() -> None:
-    st.set_page_config("マーマレーション類似度ツール")
+    st.set_page_config("Murmuration 類似度ツール")
+    st.logo(ThemeConfig().get_theme_logo_path(), size="large")
 
     with st.sidebar:
-        st.markdown("## マーマレーション類似度ツール")
         ss.old_image = st.file_uploader(
             "入稿済みCRをアップロード",
             type=["png", "jpg"],
             accept_multiple_files=False,
             help="画像ファイルを一枚だけアップロードすることができます。",
         )
+
+        if ss.old_image:
+            old_image_cols = st.columns(2)
+            with old_image_cols[0]:
+                st.image(ss.old_image)
 
         ss.new_images = st.file_uploader(
             "新規CRsをアップロード",
