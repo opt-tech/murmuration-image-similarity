@@ -54,15 +54,16 @@ def init() -> None:
 
 
 def main() -> None:
-    st.set_page_config("Murmuration 類似度ツール")
+    st.set_page_config("Murmuration Sequential Generator")
     st.logo(ThemeConfig().get_theme_logo_path(), size="large")
 
     with st.sidebar:
         ss.old_image = st.file_uploader(
             "入稿済みCRをアップロード",
-            type=["png", "jpg"],
+            type=["png", "jpg", "mp4"],
             accept_multiple_files=False,
-            help="画像ファイルを一枚だけアップロードすることができます。",
+            key=ss.old_file_uploader_id,
+            help="画像や動画ファイルを一つだけアップロードすることができます。",
         )
 
         if ss.old_image:
@@ -72,9 +73,9 @@ def main() -> None:
 
         ss.new_images = st.file_uploader(
             "新規CRsをアップロード",
-            type=["png", "jpg"],
+            type=["png", "jpg", "mp4"],
             accept_multiple_files=True,
-            help="画像ファイルを複数枚アップロードすることができます。",
+            help="画像や動画ファイルを複数アップロードすることができます。",
         )
 
         calculated = st.button("Calculate", type="primary")
