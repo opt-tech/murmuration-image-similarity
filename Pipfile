@@ -10,6 +10,7 @@ httpx = "*"
 google-auth = "*"
 google-cloud-storage = "*"
 st-theme = "*"
+opencv-python = "*"
 
 [dev-packages]
 ruff = "*"

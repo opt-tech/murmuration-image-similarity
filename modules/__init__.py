@@ -1,11 +1,11 @@
 from modules.config import ThemeConfig
-from modules.image_similarity import ImageSimilarityAPIRequest
-from modules.utils import encode_image, is_image_size_matched, is_running_on_cloudrun
+from modules.similarity import ImageSimilarity
+from modules.utils import convert_video_to_image, is_image_size_matched, on_cloudrun
 
 __all__ = [
-    "ImageSimilarityAPIRequest",
-    "is_running_on_cloudrun",
+    "ImageSimilarity",
+    "on_cloudrun",
     "is_image_size_matched",
-    "encode_image",
     "ThemeConfig",
+    "convert_video_to_image",
 ]
