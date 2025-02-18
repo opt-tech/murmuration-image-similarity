@@ -1,15 +1,15 @@
 import subprocess
 from base64 import b64encode
+from io import BytesIO
 
 import google.auth.transport.requests
 import google.oauth2.id_token
 import httpx
-from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 from modules.utils import on_cloudrun
 
 
-class ImageSimilarityAPIRequest:
+class ImageSimilarity:
     def __init__(self) -> None:
         self.url = "https://image-similarity-backend-cle7fyzzsq-uc.a.run.app/"
 
@@ -27,22 +27,14 @@ class ImageSimilarityAPIRequest:
 
         return id_token
 
-    def get_request_body(
-        self, old_image: UploadedFile, new_images: list[UploadedFile]
-    ) -> dict:
-        body = {}
-        body["image"] = b64encode(old_image.getvalue()).decode()
-        body["images"] = [
-            b64encode(img.getvalue()).decode() for img in new_images
-        ]
-
-        return body
-
     def get_image_similarity(
-        self, old_image: UploadedFile, new_images: list[UploadedFile]
+        self, old_image: BytesIO, new_images: list[BytesIO]
     ) -> dict:
         id_token = self.authorize_post_request()
-        body = self.get_request_body(old_image, new_images)
+
+        body = {}
+        body["image"] = b64encode(old_image.getvalue()).decode()
+        body["images"] = [b64encode(img.getvalue()).decode() for img in new_images]
 
         response = httpx.post(
             self.url,
