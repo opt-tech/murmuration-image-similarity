@@ -15,9 +15,6 @@ def is_image_size_matched(image: UploadedFile, images: list[UploadedFile]) -> bo
     return any([Image.open(img).size != Image.open(image).size for img in images])
 
 
-# def
-
-
 def convert_video_to_image(video: UploadedFile) -> BytesIO:
     with NamedTemporaryFile(delete=False) as tmp:
         tmp.write(video.read())
