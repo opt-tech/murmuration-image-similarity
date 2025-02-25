@@ -1,15 +1,8 @@
-from streamlit_theme import st_theme
+from dataclasses import dataclass
 
 
-class ThemeConfig:
-    def __init__(self):
-        self.dark_logo_path = "assets/msg_logo_w.png"
-        self.light_logo_path = "assets/msg_logo_b.png"
-
-    def get_theme_logo_path(self):
-        theme = st_theme()
-
-        if theme is None or theme.get("base") == "dark":
-            return self.dark_logo_path
-        else:
-            return self.light_logo_path
+@dataclass(frozen=True)
+class ImagePathConfig:
+    dark_logo_path: str = "assets/dark_logo.png"
+    light_logo_path: str = "assets/light_logo.png"
+    favicon_path: str = "assets/favicon.jpg"

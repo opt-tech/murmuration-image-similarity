@@ -4,10 +4,11 @@ from uuid import uuid4
 import streamlit as st
 from streamlit import session_state as ss
 from streamlit.runtime.uploaded_file_manager import UploadedFile
+from streamlit_theme import st_theme
 
 from modules import (
+    ImagePathConfig,
     ImageSimilarity,
-    ThemeConfig,
     convert_video_to_image,
     is_image_size_matched,
 )
@@ -69,9 +70,17 @@ def init() -> None:
 
 
 def main() -> None:
-    st.set_page_config("Murmuration Sequential Generator")
-    st.logo(ThemeConfig().get_theme_logo_path(), size="large")
-    st.header("検証用")
+    image_path_config = ImagePathConfig()
+
+    st.set_page_config(
+        "Murmuration Sequential Generator", page_icon=image_path_config.favicon_path
+    )
+
+    theme = st_theme()
+    if theme is None or theme.get("base") == "dark":
+        st.logo(image_path_config.dark_logo_path, size="large")
+    else:
+        st.logo(image_path_config.light_logo_path, size="large")
 
     with st.sidebar:
         ss.old_image = st.file_uploader(
@@ -86,7 +95,7 @@ def main() -> None:
             if ss.old_image.type in ["video/mp4", "video/mpeg4"]:
                 ss.old_image = convert_video_to_image(ss.old_image)
 
-            if ss.old_image.type == "image/png":
+            if ss.old_image.type in ["image/png", "image/jpeg"]:
                 old_image_col, _, _ = st.columns(3)
                 old_image_col.image(ss.old_image)
 
@@ -122,10 +131,11 @@ def main() -> None:
                 icon="⚠️",
             )
 
-        image_similarity = ImageSimilarity()
-        ss.similarities = image_similarity.get_image_similarity(
-            ss.old_image, ss.new_images
-        ).get("values")
+        with st.spinner("類似度を計算中...", show_time=True):
+            image_similarity = ImageSimilarity()
+            ss.similarities = image_similarity.get_image_similarity(
+                ss.old_image, ss.new_images
+            ).get("values")
 
     display_sort_selectbox(ss.new_images, ss.similarities)
 
